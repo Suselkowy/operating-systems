@@ -1,0 +1,5 @@
+-ignorowanie jest dziedziczone
+-handler jest dziedziczony przez fork
+-mask jest dziedziczone
+-Sygnal wyslany w przodku nie jest widoczny w potomku(fork)
+Jest natomiast widoczny przy uyciu funkcji execl

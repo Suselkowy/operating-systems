@@ -1,0 +1,120 @@
+Komentarz:
+Biblioteka statyczna i shared maj podobne czasy wykonania polecen.
+Biblioteka dynamiczna wydaje sie by najszybsza, jednak przy tak malych czasach i
+ilosci testow ciezko stwierdzic czy jest to faktyczna zaleznosc.
+
+---------------Biblioteka statyczna------------------
+real time: 0.000004s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004960s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.015424s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005653s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000003s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+-----------------Biblioteka shared--------------------
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004951s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.011188s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005270s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+
+---------------Biblioteka dynamiczna------------------
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005539s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.013272s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006262s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+
+
+

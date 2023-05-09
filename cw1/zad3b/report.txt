@@ -1,0 +1,670 @@
+Komantarz:
+Czasy sa bardzo podobne.
+O0 jest wolniejsze od innych, O3 najszybsze, jednak przy tak krotkich plikach roznica ta jest mala.
+Tak jak w poprzednim zadaniu - ciezko okreslic czy jest to rzeczywista zaleznosc czy przypadek.
+---------------static_O---------------
+real time: 0.000004s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005412s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.012660s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005441s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------shared_O---------------
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006716s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.016708s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005940s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------dynamic_O--------------
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005905s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.012299s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005003s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------static_O1---------------
+real time: 0.000003s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005227s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.012226s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006100s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000003s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------shared_O1---------------
+real time: 0.000003s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004713s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.014132s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004833s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------dynamic_O1--------------
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005692s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.011525s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005116s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------static_O2---------------
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005680s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.014322s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006145s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------shared_O2---------------
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.015435s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006692s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005341s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------dynamic_O2--------------
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004953s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.012483s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005501s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000004s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------static_O3---------------
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006695s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.015073s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006940s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------shared_O3---------------
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006043s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.017049s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005168s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000003s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------dynamic_O3--------------
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006595s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.014928s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005993s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------static_O0---------------
+real time: 0.000004s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004871s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.013583s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005128s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------shared_O0---------------
+real time: 0.000005s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006237s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.013359s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.005679s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------dynamic_O0--------------
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004828s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.012809s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004614s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------static_Os---------------
+real time: 0.000005s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006715s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.013369s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004880s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------shared_Os---------------
+real time: 0.000004s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.016668s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004797s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.004593s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000002s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+---------------dynamic_Os--------------
+real time: 0.000004s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.007485s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.013348s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.006152s
+system time: 0.000000s
+user time: 0.000000s
+ 142  383 3504 main.c
+real time: 0.000003s
+system time: 0.000000s
+user time: 0.000000s
+  86  190 1819 libtextlibrary.c
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+ 30  64 595 libtextlibrary.h
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000001s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
+real time: 0.000000s
+system time: 0.000000s
+user time: 0.000000s
