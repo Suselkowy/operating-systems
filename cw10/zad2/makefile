@@ -9,10 +9,6 @@ server:
 client:
 	gcc -o client client_socket.c 
 
-.PHONY:test
-test:
-	gcc -o test test.c
-
 clean:
 	rm -f server
 	rm -f client
