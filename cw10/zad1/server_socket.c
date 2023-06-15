@@ -115,7 +115,7 @@ int new_client(int* num_of_clients, int* curr_c, int fd){
         }
 
         if(clients[curr_client].fd != -1){
-            while(clients[curr_client].fd == -1){
+            while(clients[curr_client].fd != -1){
                 curr_client += 1;
                 if(curr_client >= MAX_CLIENTS){
                     curr_client = 0;
