@@ -185,15 +185,15 @@ int main(int argc, char** argv) {
 
     printf("Server listening on *:%d and '%s'\n", port, socket_path);
     int check = pthread_create(&ping_thread, NULL, ping_service, (void *)clients);
-    int nfds;
+    int number_of_events;
     struct epoll_event events[MAX_EVENTS];
     while(running){
-        nfds = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
-        if (nfds == -1) {
+        number_of_events = epoll_wait(epoll_fd, events, MAX_EVENTS, -1);
+        if (number_of_events == -1) {
             perror("Error waiting for events.\n");
             return -1;
         }
-        for (size_t i = 0; i < nfds; i++)
+        for (size_t i = 0; i < number_of_events; i++)
         {   
             union addr addr;
             socklen_t addrlen = sizeof(addr);
