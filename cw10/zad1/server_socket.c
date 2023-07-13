@@ -200,10 +200,11 @@ int main(int argc, char** argv) {
 
     epoll_fd = epoll_create1(0);
 
-    struct epoll_event ev;
+    
     struct message rcv_buff;
     struct message snd_buff;
 
+    struct epoll_event ev;
     ev.data.fd = local_fd;
     ev.events = EPOLLIN;
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, local_fd, &ev) < 0)
