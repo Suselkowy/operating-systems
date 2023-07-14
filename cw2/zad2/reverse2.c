@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
 #include "libhelpers.h"
 
 
@@ -80,9 +79,7 @@ int main( int argc, char *argv[] )  {
     clock_gettime(CLOCK_REALTIME, &end);
     double time = get_time(&start, &end);
 
-
-    save_to_file(time, '2');
-
+    log_time(time, '2');
     close_file(file_to_read);
     close_file(file_to_write);
 

@@ -1,8 +1,10 @@
-//closes provided file
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
 void close_file(FILE* f);
 
-//returns time in seconds from timespect
 double get_time(struct timespec* timespec_s, struct timespec* timespec_e);
 
-//saves time to pomiar_zad_2.txt file
-void save_to_file(double time, char reverse_number);
+void log_time(double time, char program_version);

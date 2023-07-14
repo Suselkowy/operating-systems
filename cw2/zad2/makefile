@@ -3,7 +3,6 @@ all:
 	make reverse_1
 	make reverse_2
 
-
 lib:
 	gcc -Wall -c libhelpers.c
 	ar cr libhelpers.a libhelpers.o
