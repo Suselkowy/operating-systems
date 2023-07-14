@@ -3,87 +3,86 @@
 #include <time.h>
 #include "libhelpers.h"
 
+FILE* file_to_read;
+FILE* file_to_write;
 
-int shift(int pos){
-    if(pos > 2048){
-        return -1024;
+void close_files() {
+    if (file_to_read != NULL) {
+        fclose(file_to_read);
+        file_to_read = NULL;
     }
-    return -(pos - 1024);
+    if (file_to_write != NULL) {
+        fclose(file_to_write);
+        file_to_write = NULL;
+    }
 }
 
-int main( int argc, char *argv[] )  {
-
-    if(argc < 2){
-        fprintf(stderr, "Not enough parameters provided");
-        return -1;
-    }
-    
-    FILE* create = fopen(argv[2],"w+");
-    fclose(create);
-
-    FILE* file_to_read = fopen(argv[1], "r");
-
+void open_files(char* input_file_path, char* output_file_path){
+    file_to_read = fopen(input_file_path, "r");
     if(file_to_read == NULL){
         fprintf(stderr, "Failed to open first file");
-        return -1;
+        exit(-1);
     }
 
-    FILE* file_to_write = fopen(argv[2], "a");
-
-
+    file_to_write = fopen(output_file_path, "w+");
     if(file_to_write == NULL){
         fprintf(stderr, "Failed to open second file");
-        close_file(file_to_read);
-        return -1;
+        close_files();
+        exit(-1);
     }
+}
 
-    struct timespec start, end;
-
-	clock_gettime(CLOCK_REALTIME, &start);
-
-    char *currLetter = calloc(1024, sizeof(char));
+void reverse_file(){
+    char* char_buff = calloc(1024, sizeof(char));
+    if (char_buff == NULL) {
+        perror("Memory allocation failed");
+        close_files();
+        exit(EXIT_FAILURE);
+    }
 
     fseek(file_to_read, 0, SEEK_END);
+    int pos = ftell(file_to_read);
+    int num_chars_to_read;
 
-    int file_size = ftell(file_to_read);
-    int iterations = (file_size / 1024);
-
-    if(file_size >= 1024){
-        fseek(file_to_read, -1024, SEEK_END);
-    }else{
-        fseek(file_to_read, 0, SEEK_SET);
-    }
-
-    int tmp = fread(currLetter, sizeof(char), 1024, file_to_read);
-
-    int c = 0;
-    int nshif = -tmp;
-
-    while ( c <= iterations)
+    while ( pos > 0 )
     {   
+        num_chars_to_read = (pos > 1024) ? 1024 : pos;
+        fseek(file_to_read, -num_chars_to_read, SEEK_CUR);
+        fread(char_buff, sizeof(char), num_chars_to_read, file_to_read);
 
-        char* tmp = currLetter + -nshif - 1;
-        for (size_t i = 0; i < -nshif; i++)
+        char* tmp = char_buff + num_chars_to_read - 1;
+        for (size_t i = 0; i < num_chars_to_read; i++)
         {
             fwrite(tmp, sizeof(char), 1, file_to_write);
             --tmp;
         }
-
-        nshif = shift(ftell(file_to_read));
-
-        fseek(file_to_read, -1024 + nshif, SEEK_CUR);
-        fread(currLetter, sizeof(char), 1024, file_to_read);
-        ++c;
+        fseek(file_to_read, -num_chars_to_read, SEEK_CUR);
+        pos -= num_chars_to_read;
     }
+
+    free(char_buff);
+}
+
+int main( int argc, char *argv[] )  {
+    if(argc < 2){
+        fprintf(stderr, "Not enough parameters provided");
+        return -1;
+    }
+
+    char* input_file = argv[1];
+    char* output_file = argv[2];
+    open_files(input_file, output_file);
+
+    struct timespec start, end;
+	clock_gettime(CLOCK_REALTIME, &start);
+
+    reverse_file();
 
     clock_gettime(CLOCK_REALTIME, &end);
     double time = get_time(&start, &end);
-
     log_time(time, '2');
-    close_file(file_to_read);
-    close_file(file_to_write);
 
-
+    close_files();
     return 0;
 }
 
