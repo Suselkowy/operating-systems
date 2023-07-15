@@ -7,7 +7,6 @@
 int main( int argc, char *argv[] )  {
 
     DIR* dir_stream = opendir(".");
-
     if(dir_stream == NULL){
         fprintf(stderr, "Failed to open directory");
         return -1;
@@ -15,9 +14,7 @@ int main( int argc, char *argv[] )  {
 
     struct dirent* curr_dir;
     struct stat filestat;
-
     long long total = 0;
-
     while (curr_dir = readdir(dir_stream))
     {   
         stat(curr_dir->d_name, &filestat);

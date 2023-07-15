@@ -7,8 +7,8 @@
 int main(int argc, char *argv[]) {
 
     if(argc != 2 ){
-    fprintf(stderr, "Invalid number of arguments");
-    return 1;
+        fprintf(stderr, "Invalid number of arguments - expected 1, provided %d", argc);
+        return 1;
     }    
 
     printf("%s ", argv[0]);

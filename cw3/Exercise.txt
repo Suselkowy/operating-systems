@@ -23,5 +23,3 @@ Wskazówki:
 - Procesy nie muszą czekać na zakończenie swoich procesów potomnych.
 - Długość ścieżki do dowolnego pliku, wraz z końcowym znakiem \0, nie przekracza stałej PATH_MAX, zdefiniowanej w pliku nagłówkowym limits.h
 - Proszę przetestować program, podając jako argv[1] między innymi ścieżki . .. ../.. ~ /root, a jako argv[2] między innymi łańcuchy znaków \#include asdf zadanie
-
-Miłego programowania :)
