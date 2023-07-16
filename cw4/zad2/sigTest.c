@@ -95,11 +95,6 @@ int main(int argc, char *argv[]) {
     raise(SIGTERM);
     printf("rise SIGTERM\n");
     raise(SIGTERM);    
-
-
-
-
-
     return 0;
 }
 
