@@ -1,4 +1,11 @@
-time = 0.406358 width = 0.000100 n = 1000
-time = 3.754673 width = 0.000100 n = 10000
-time = 2.664556 width = 0.000010 n = 10000
-time = 14.819466 width = 0.000001 n = 100000
+time = 0.032567 rectangle_width = 0.000100 number_of_processes = 100
+time = 0.269970 rectangle_width = 0.000100 number_of_processes = 1000
+time = 2.360083 rectangle_width = 0.000100 number_of_processes = 10000
+time = 2.210830 rectangle_width = 0.000010 number_of_processes = 10000
+time = 2.251950 rectangle_width = 0.000001 number_of_processes = 10000
+time = 11.377511 rectangle_width = 0.000001 number_of_processes = 100000
+time = 0.215752 rectangle_width = 0.000001 number_of_processes = 1000
+time = 0.297428 rectangle_width = 0.000001 number_of_processes = 1000
+time = 0.308623 rectangle_width = 0.000001 number_of_processes = 1000
+time = 0.236217 rectangle_width = 0.000001 number_of_processes = 1000
+time = 0.222971 rectangle_width = 0.000001 number_of_processes = 1000

@@ -8,50 +8,49 @@
 #include <math.h>
 #include <sys/wait.h>
 #include <time.h>
+#include <errno.h>
+#define PIPELINE_FILE_PATH "./potok"
 
-
-double func(double x);
+double integral_function(double x);
 
 int main(int argc, char const *argv[])
 {   
     if(argc != 4){
-        fprintf(stderr, "Invalid number of agruments\n");
+        fprintf(stderr, "Invalid number of agruments: 3 expected, %d provided\n", argc-1);
         return EXIT_FAILURE;
     }
 
-    int f = open("./potok", O_WRONLY);
-
-    if(f < 0){
-        perror("Failed to open file");
+    int pipeline_fd = open(PIPELINE_FILE_PATH, O_WRONLY);
+    if(pipeline_fd < 0){
+        fprintf(stderr, "%s: Failed to open file %s\n", strerror(errno), PIPELINE_FILE_PATH);
         return EXIT_FAILURE;
     }
 
-    char **end;
-    int times = atoi(argv[1]);
-    double width = strtod(argv[2], end);
-    double start = strtod(argv[3], end);
+    int number_rectangles_to_process = atoi(argv[1]);
+    double rectangle_width = strtod(argv[2], NULL);
+    double start_point = strtod(argv[3], NULL);
     double sum = 0;
 
-    for (int j = 0; j < times; j++)
+    for (int j = 0; j < number_rectangles_to_process; j++)
     {
-        double temp_end = start+width;
+        double temp_end = start_point+rectangle_width;
         if(temp_end > 1){
-            sum += func(start+(temp_end - start)/2) * (temp_end - start);
+            sum += integral_function(start_point+(temp_end - start_point)/2) * (temp_end - start_point);
         }else{
-            sum += func(start+(width/2)) * width;
+            sum += integral_function(start_point+(rectangle_width/2)) * rectangle_width;
         }
-        start += width;
+        start_point += rectangle_width;
         
     }
 
     char line[128];
     sprintf(line, "%lf", sum);
-    write(f, line, 128);
-    close(f);
+    write(pipeline_fd, line, 128);
 
+    close(pipeline_fd);
     return 0;
 }
 
-double func(double x){
+double integral_function(double x){
     return 4/(x*x + 1);
 }

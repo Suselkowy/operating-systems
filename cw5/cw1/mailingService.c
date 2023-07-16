@@ -6,6 +6,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+enum sort_type{DATE, SENDER};
+
 int main(int argc, char const *argv[])
 {   
     if(argc != 2 && argc != 4){
@@ -13,22 +15,21 @@ int main(int argc, char const *argv[])
         return EXIT_FAILURE;
     }
 
-    
     if(argc == 2){
-        int read_type;
+        int sort_by;
+        const char* command = argv[1];
 
-        if(strncmp(argv[1], "data", 4) == 0){
-            read_type = 0;
-        }else if(strncmp(argv[1], "nadawca", 7) == 0){
-            read_type = 1;
+        if(strncmp(command, "data", 4) == 0){
+            sort_by = DATE;
+        }else if(strncmp(command, "nadawca", 7) == 0){
+            sort_by = SENDER;
         }else{
-        fprintf(stderr, "Invalid agrument");
-        return EXIT_FAILURE;
+            fprintf(stderr, "Invalid agrument");
+            return EXIT_FAILURE;
         }
-        char* line = calloc(1024, sizeof(char));
-        FILE* p;
 
-        if(!read_type){
+        FILE* p;
+        if(sort_by == DATE){
             p = popen("mail | tail -n +3 | head -n -1", "w");
         }else{
             p = popen("mail | tail -n +3 | head -n -1 | sort -k 3 ", "w");
@@ -36,17 +37,18 @@ int main(int argc, char const *argv[])
 
         fwrite("q", sizeof(char), 1, p);
         pclose(p);
-        free(line);
+
     }else{
-        char* line = calloc(1024, sizeof(char));
-        sprintf(line, "mail -s %s %s", argv[2], argv[1]);
-        printf("%s", line);
-        FILE* p = popen(line, "w");
-        fputs(argv[3], p);
+        char* line_buff = calloc(1024, sizeof(char));
+        sprintf(line_buff , "mail -s %s %s", argv[2], argv[1]);
+        printf("%s", line_buff);
+
+        FILE* p = popen(line_buff, "w");
+        fputs(argv[3], p); 
+
         pclose(p);
+        free(line_buff);
     }
-
-
 
     return 0;
 }
