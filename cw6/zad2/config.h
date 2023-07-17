@@ -2,10 +2,9 @@
 #define SERVER_KEY_ID 'S'
 #define MAX_NUM_OF_CLIENTS 4
 
-
 struct msgbuf{
     long ntype;
-    int clientId;
+    int client_id;
     char mtext[MAX_MESSAGE_LENGTH];
 };
 

@@ -1,176 +1,166 @@
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <math.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
-#include <sys/ipc.h>
 #include "config.h"
-#include <signal.h>
 
-char* list(int* clients, int currClient);
-void handle_rcv(struct msgbuf *rcv, struct msgbuf *msg, FILE* log);
-void zero_mtext(struct msgbuf *msg);
+char* list_clients(int* clients_messqueue_id, int curr_client);
+void handle_rcv();
+void clear_mtext(struct msgbuf *msg);
+void init_clients_messqueue_id_array();
+void handle_sigint();
+void disconnect_clients();
+void log_message(struct msgbuf* mess);
 
-int clients[MAX_NUM_OF_CLIENTS];
+int clients_messqueue_id[MAX_NUM_OF_CLIENTS];
+int server_messqueue_id;
 int active_clients = 0;
-
+int next_client_id = 0;
 int running = 1;
-int currClient = 0;
-int msqid;
 
-void init_clients(int* clients){
-    for (size_t i = 0; i < MAX_NUM_OF_CLIENTS; i++)
-    {
-        clients[i] = -1;
-    }
-    
-}
-
-void handler(){
-    running = 0;
-}
+struct msgbuf rcv;
 
 int main(int argc, char const *argv[])
 {      
-    init_clients(clients);
-    signal(SIGINT, handler);
+    init_clients_messqueue_id_array();
+    signal(SIGINT, handle_sigint);
 
-    FILE* log = fopen("log.txt", "w+");
-    
     key_t key = ftok(getenv("HOME"), SERVER_KEY_ID);
+    server_messqueue_id = msgget(key, IPC_CREAT | 0666);
+    printf("Starting server with id = %d\n", server_messqueue_id);
 
-    int msqid = msgget(key, IPC_CREAT | 0666);
-
-    printf("Starting server with id = %d\n", msqid);
-
-    struct msgbuf msg = {1,-1,""};
-    struct msgbuf rcv;
     while (running)
     {
-        if(msgrcv(msqid, &rcv, sizeof(rcv), -NUMBER_OF_TYPES, IPC_NOWAIT ) != -1){
-            handle_rcv(&rcv, &msg, log);
-        }
-    }
-    for (size_t i = 0; i < MAX_NUM_OF_CLIENTS; i++)
-    {
-        msg.ntype = COMM_STOP;
-        if(clients[i] != -1){
-            msgsnd(clients[i], &msg, sizeof(msg), IPC_NOWAIT);        
-        }
-        zero_mtext(&msg);
-    }
-
-    printf("%d", active_clients);
-    while(active_clients > 0){
-        if(msgrcv(msqid, &rcv, sizeof(rcv), -NUMBER_OF_TYPES, IPC_NOWAIT ) != -1){
-            if(rcv.ntype == COMM_STOP){
-                msgctl(clients[rcv.clientId], IPC_RMID, NULL);
-                clients[rcv.clientId] = -1;
-                --active_clients;
-                printf("%d active clients \n", active_clients);
-            }
+        if(msgrcv(server_messqueue_id, &rcv, sizeof(rcv), -NUMBER_OF_TYPES, IPC_NOWAIT ) != -1){
+            handle_rcv();
         }
     }
 
-    msgctl(msqid, IPC_RMID, NULL);
-    fclose(log);
+    disconnect_clients();
+    if (msgctl(server_messqueue_id, IPC_RMID, NULL) == -1) {
+        perror("Error removing message queue");
+    }
     return 0;
 }
 
-char* list(int* clients, int currClient){
-    char* ans = calloc(MAX_MESSAGE_LENGTH, sizeof(char));
-    int j = 0;
+void disconnect_clients(){
+    struct msgbuf msg = {1,-1,""};
     for (size_t i = 0; i < MAX_NUM_OF_CLIENTS; i++)
     {
-        if(clients[i] != -1 && i != currClient){
-            sprintf(&ans[j], "%d, ", i);
-            j+= strlen(&ans[j]);
+        msg.ntype = COMM_STOP;
+        if(clients_messqueue_id[i] != -1){
+            msgsnd(clients_messqueue_id[i], &msg, sizeof(msg), IPC_NOWAIT);        
+        }
+    }
+
+    while(active_clients > 0){
+        if(msgrcv(server_messqueue_id, &rcv, sizeof(rcv), -NUMBER_OF_TYPES, IPC_NOWAIT ) != -1){
+            if(rcv.ntype == COMM_STOP){
+                msgctl(clients_messqueue_id[rcv.client_id], IPC_RMID, NULL);
+                clients_messqueue_id[rcv.client_id] = -1;
+                --active_clients;
+                printf("disconnected client %d\n", rcv.client_id);
+            }
+        }
+    }
+}
+
+char* list_clients(int* clients_messqueue_id, int curr_client){
+    char* ans = calloc(MAX_MESSAGE_LENGTH, sizeof(char));
+    int string_length = 0;
+    for (size_t i = 0; i < MAX_NUM_OF_CLIENTS; i++)
+    {
+        if(clients_messqueue_id[i] != -1 && i != curr_client){
+            sprintf(&ans[string_length], "%d, ", i);
+            string_length += strlen(&ans[string_length]);
         }
     }
     return ans;
 }
 
-void handle_rcv(struct msgbuf *rcv, struct msgbuf *msg, FILE* log){
-    time_t t;
-    time(&t);
+void log_message(struct msgbuf* mess){
+    FILE* log = fopen("log.txt", "a+");
 
     time_t rawtime;
-    struct tm * timeinfo;
-
+    struct tm* timeinfo;
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
 
-    fprintf(log, "%d %d '%s' %s",rcv->clientId, rcv->ntype, rcv->mtext , asctime(timeinfo));
+    fprintf(log, "%d %d '%s' %s",mess->client_id, mess->ntype, mess->mtext , asctime(timeinfo));
 
-    switch (rcv->ntype)
+    fclose(log);
+}
+
+void handle_rcv(){
+
+    log_message(&rcv);
+
+    struct msgbuf msg = {1,-1,""};
+    switch (rcv.ntype)
     {
         case COMM_INIT:
-            msg->ntype = COMM_INIT;
+            msg.ntype = COMM_INIT;
+
             if(active_clients == MAX_NUM_OF_CLIENTS){
-                msg->clientId = -1;
+                msg.client_id = -1;
             }else{
-                msg->clientId = currClient;
-                clients[currClient] = rcv->clientId;
-
-                printf("new connection %d\n", clients[currClient]);
-                fflush(stdout);
-
-                ++currClient;
+                msg.client_id = next_client_id;
+                clients_messqueue_id[next_client_id] = rcv.client_id;
+                ++next_client_id;
                 ++active_clients;
+
+                printf("new connection %d\n", next_client_id);
             }
-            
-            msgsnd(rcv->clientId, msg, sizeof(*msg), IPC_NOWAIT);
-            zero_mtext(msg);
+
+            msgsnd(rcv.client_id, &msg, sizeof(msg), IPC_NOWAIT);
             break;
         case COMM_2ALL:
-            strcpy(msg->mtext, rcv->mtext);
-            msg->ntype = COMM_2ALL;
-            msg->clientId = rcv->clientId;
+            msg.ntype = COMM_2ALL;
+            msg.client_id = rcv.client_id;
+            strcpy(msg.mtext, rcv.mtext);
+            
             for (size_t i = 0; i < MAX_NUM_OF_CLIENTS; i++)
             {
-                if(clients[i] != -1 && i != rcv->clientId){
-                    msgsnd(clients[i], msg, sizeof(*msg), IPC_NOWAIT);
-                    zero_mtext(msg);
+                if(clients_messqueue_id[i] != -1 && i != rcv.client_id){
+                    msgsnd(clients_messqueue_id[i], &msg, sizeof(msg), IPC_NOWAIT);
                 }
             }
+
             break;
         case COMM_2ONE:
-            int id = atoi(strtok(rcv->mtext, " "));
-            char* mess = strtok(NULL, "\n");
-            strcpy(msg->mtext, mess);
-            msg->clientId = rcv->clientId;
-            msg->ntype = COMM_2ONE;
+            msg.ntype = COMM_2ONE;
+            msg.client_id = rcv.client_id;
 
-            if(clients[id] == -1){
+            char* id_str = strtok(rcv.mtext, " ");
+            if(id_str == NULL){
+                perror("Unable to send message.No client id proided.\n");
+                break;
+            }
+            int id = atoi(id_str);
+            char* mess = strtok(NULL, "\n");
+            if(mess == NULL){
+                strcpy(msg.mtext, "");
+            }else{
+                strcpy(msg.mtext, mess);
+            }
+        
+            if(clients_messqueue_id[id] == -1){
                 printf("Client does not exists\n");
             }else{
-                msgsnd(clients[id], msg, sizeof(*msg), IPC_NOWAIT);
-                zero_mtext(msg);
+                msgsnd(clients_messqueue_id[id], &msg, sizeof(msg), IPC_NOWAIT);
             }
 
-            strcpy(rcv->mtext, "");
             break;
         case COMM_STOP:
-            msgctl(clients[rcv->clientId], IPC_RMID, NULL);
-            clients[rcv->clientId] = -1;
+            msgctl(clients_messqueue_id[rcv.client_id], IPC_RMID, NULL);
+            clients_messqueue_id[rcv.client_id] = -1;
             active_clients--;
+            printf("disconnected client %d\n", rcv.client_id);
             break;
         case COMM_LIST:
-            msg->clientId = -1;
-            msg->ntype = COMM_LIST;
-            char* tmp = list(clients, rcv->clientId);
-            strcpy(msg->mtext, tmp);
-            free(tmp);
-            msgsnd(clients[rcv->clientId], msg, sizeof(*msg), IPC_NOWAIT);
-            zero_mtext(msg);
+            msg.ntype = COMM_LIST;
+            msg.client_id = -1;
+            char* list_of_clients = list_clients(clients_messqueue_id, rcv.client_id);
+            strcpy(msg.mtext, list_of_clients);
+            msgsnd(clients_messqueue_id[rcv.client_id], &msg, sizeof(msg), IPC_NOWAIT);
+
+            free(list_of_clients);
             break;
         default:
             printf("invalid message\n");
@@ -178,6 +168,17 @@ void handle_rcv(struct msgbuf *rcv, struct msgbuf *msg, FILE* log){
     }
 }
 
-void zero_mtext(struct msgbuf* msg){
+void clear_mtext(struct msgbuf* msg){
     memset(msg->mtext, 0, MAX_MESSAGE_LENGTH+1);
+}
+
+void init_clients_messqueue_id_array(){
+    for (size_t i = 0; i < MAX_NUM_OF_CLIENTS; i++)
+    {
+        clients_messqueue_id[i] = -1;
+    }
+}
+
+void handle_sigint(){
+    running = 0;
 }

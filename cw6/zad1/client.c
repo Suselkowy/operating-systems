@@ -1,119 +1,58 @@
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <math.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
-#include <sys/ipc.h>
 #include "config.h"
-#include <signal.h>
 
-void handle_rcv(int serverid);
-void zero_mtext();
+void handle_rcv();
+void clear_mtext(struct msgbuf* msg);
+void close_program();
+void set_alarm(int seconds);
+void process_message_queue();
+void init_connection(int server_messqueue_id, int client_messqueue_id);
 
 int running = 1;
-int init = 1;
-int client_id = 0;
-int msqid;
-int serverid;
+int client_name;
+int client_messqueue_id;
+int server_messqueue_id;
 
 struct msgbuf msg = {COMM_INIT, 0, ""};
 struct msgbuf rcv;
 
-void handler(){
-    running = 0;
-    msg.ntype = COMM_STOP;
-    msgsnd(serverid, &msg, sizeof(msg), IPC_NOWAIT);
-    exit(EXIT_SUCCESS);
-}
-
-void handler_alrm(){
-    alarm(0);
-    if(running){
-        while(msgrcv(msqid, &rcv, sizeof(rcv), -NUMBER_OF_TYPES, IPC_NOWAIT ) != -1){
-            handle_rcv(serverid);
-        }
-    }
-    alarm(1);
-}
-
 int main(int argc, char const *argv[])
 {      
-    signal(SIGINT, handler);
-    signal(SIGALRM, handler_alrm);
+    signal(SIGINT, close_program);
+    signal(SIGALRM, process_message_queue);
 
     key_t key = ftok(getenv("HOME"), SERVER_KEY_ID);
-    serverid = msgget(key, IPC_EXCL|0666);
+    server_messqueue_id = msgget(key, IPC_EXCL|0666);
+    client_messqueue_id = msgget(IPC_PRIVATE , IPC_CREAT | 0666);
 
-    msqid = msgget(IPC_PRIVATE , IPC_CREAT | 0666);
+    init_connection(server_messqueue_id, client_messqueue_id);
+    set_alarm(1);
 
-    msg.clientId = msqid;
-    msg.ntype = COMM_INIT;
-
-    msgsnd(serverid, &msg, sizeof(msg), IPC_NOWAIT);
-
-    while (init)
-    {
-        if(msgrcv(msqid, &rcv, sizeof(rcv), 0, IPC_NOWAIT ) != -1){
-            if(rcv.clientId == -1){
-                fprintf(stderr, "max number of clients connected to server");
-                raise(SIGINT);
-            }
-            client_id = rcv.clientId;
-            msg.clientId = client_id;
-            init = 0;
-        }
-    }
-
-    char* wtf;
     char* buff = NULL;
 	size_t buff_size;
-    alarm(1);
     while (running)
     {
-        printf("%d>", client_id);
-        fflush(stdout);
+        printf("%d>", client_name);
 		getline(&buff, &buff_size, stdin);
 
         if(buff_size > 0){
             if(strncmp(buff, "LIST", 4) == 0){
                 msg.ntype = COMM_LIST;
-                zero_mtext();
-                msgsnd(serverid, &msg, sizeof(msg), IPC_NOWAIT);
-                int list_present = 0;
-                while(!list_present){
-                    if(msgrcv(msqid, &rcv, sizeof(rcv), -NUMBER_OF_TYPES, IPC_NOWAIT ) != -1){
-                        if(rcv.ntype == COMM_LIST){
-                            list_present = 1;
-                        }
-                        handle_rcv(serverid);
-                    }
-                }
+                msgsnd(server_messqueue_id, &msg, sizeof(msg), IPC_NOWAIT);
             }else if(strncmp(buff, "2ALL", 4) == 0){
-                strncpy(msg.mtext, &buff[5], strlen(&buff[5])-1);
                 msg.ntype = COMM_2ALL;
-                msgsnd(serverid, &msg, sizeof(msg), IPC_NOWAIT);
-                zero_mtext();
+                clear_mtext(&msg);
+                strncpy(msg.mtext, &buff[5], strlen(&buff[5])-1);
+                msgsnd(server_messqueue_id, &msg, sizeof(msg), IPC_NOWAIT);
             }else if(strncmp(buff, "STOP", 4) == 0){
                 msg.ntype = COMM_STOP;
                 strcpy(msg.mtext, "");
-                msgsnd(serverid, &msg, sizeof(msg), IPC_NOWAIT);
-                zero_mtext();
+                msgsnd(server_messqueue_id, &msg, sizeof(msg), IPC_NOWAIT);
                 raise(SIGINT);
             }else if(strncmp(buff, "2ONE", 4) == 0){
                 msg.ntype = COMM_2ONE;
+                clear_mtext(&msg);
                 strncpy(msg.mtext, &buff[5], strlen(&buff[5])-1);
-                msgsnd(serverid, &msg, sizeof(msg), IPC_NOWAIT);
-                zero_mtext();
-            }else if(strncmp(buff, "CHECK", 5) == 0){
-                //do nothing
+                msgsnd(server_messqueue_id, &msg, sizeof(msg), IPC_NOWAIT);
             }else{
                 printf("Invalid command\n");
             }
@@ -124,30 +63,65 @@ int main(int argc, char const *argv[])
     return 0;
 }
 
+void close_program(){
+    running = 0;
+    msg.ntype = COMM_STOP;
+    msgsnd(server_messqueue_id, &msg, sizeof(msg), IPC_NOWAIT);
+    msgctl(client_messqueue_id, IPC_RMID, NULL);
+    exit(EXIT_SUCCESS);
+}
+void set_alarm(int seconds) {
+    alarm(seconds);
+}
 
-void handle_rcv(int serverid){
-    int print_prompt = 1;
+void process_message_queue(){
+    if(running){
+        while(msgrcv(client_messqueue_id, &rcv, sizeof(rcv), -NUMBER_OF_TYPES, IPC_NOWAIT ) != -1){
+            handle_rcv();
+        }
+    }
+    set_alarm(1);
+}
+
+void init_connection(int server_messqueue_id, int client_messqueue_id){
+    msg.client_id = client_messqueue_id;
+    msg.ntype = COMM_INIT;
+    msgsnd(server_messqueue_id, &msg, sizeof(msg), IPC_NOWAIT);
+
+    int is_waiting_for_init_message = 1;
+    while (is_waiting_for_init_message)
+    {
+        if(msgrcv(client_messqueue_id, &rcv, sizeof(rcv), 0, IPC_NOWAIT ) != -1){
+            if(rcv.ntype == COMM_INIT){
+                if(rcv.client_id == -1){
+                    fprintf(stderr, "max number of clients connected to server. Try again later\n");
+                    raise(SIGINT);
+                }
+                msg.client_id = client_name = rcv.client_id;
+                is_waiting_for_init_message = 0;
+            }
+        }
+    }
+}
+
+void handle_rcv(){
     if(rcv.ntype == COMM_STOP){
         running = 0;
         raise(SIGINT);
     }else if(rcv.ntype == COMM_2ALL){
-        printf("Broadcast message: %s\n", rcv.mtext);
+        printf("\nBroadcast message: %s\n", rcv.mtext);
     }else if(rcv.ntype == COMM_2ONE){
-        printf("Private message: %s\n", rcv.mtext);
+        printf("\nPrivate message: %s\n", rcv.mtext);
     }else if(rcv.ntype == COMM_LIST){
-        print_prompt = 0;
-        printf("List of users: %s\n", rcv.mtext);
+        printf("\nList of users: %s\n", rcv.mtext);
     }else{
-        printf("Invalid message recived\n");
+        printf("\nInvalid message recived\n");
     }
-    if(print_prompt){
-        printf("%d>", client_id);
-        fflush(stdout);
-    }
-    
-    
+    printf("%d>", client_name);
+    fflush(stdout);
 }
 
-void zero_mtext(){
-    memset(msg.mtext, 0, MAX_MESSAGE_LENGTH+1);
+void clear_mtext(struct msgbuf* msg){
+    memset(msg->mtext, 0, MAX_MESSAGE_LENGTH+1);
+    strncpy(msg->mtext, "\0", 1);
 }
