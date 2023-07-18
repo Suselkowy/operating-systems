@@ -11,18 +11,18 @@
 void* thread_routine_santa(void* arg);
 void* thread_routine_reindeer(void* arg);
 void* thread_routine_elf(void* arg);
+void wake_up();
+void sig_handler_thread();
+void create_santa(pthread_t** thread_ids, struct thread_config* conf);
+void create_reindeers(pthread_t** thread_ids, struct thread_config* conf);
+void create_elves(pthread_t** thread_ids, struct thread_config* conf);
+void cleanup(pthread_t** thread_ids, sem_t* semaphores, size_t semaphores_count,
+             int* waiting_elves, int* waiting_reindeers);
 
-void sig_handler_fake(){
-
-}
-
-void sig_handler_thread(){
-    exit(EXIT_SUCCESS);
-}
 
 int main(int argc, char* argv[])
 {   
-    signal(SIGUSR1, sig_handler_fake);
+    signal(SIGUSR1, wake_up);
     pthread_mutex_t x_mutex = PTHREAD_MUTEX_INITIALIZER;
     int mut = pthread_mutex_init(&x_mutex, NULL);
 
@@ -82,58 +82,49 @@ int main(int argc, char* argv[])
 
     pthread_t** thread_ids = malloc(sizeof(pthread_t*) * 20);
 
-    //Create Santa
-    thread_ids[0] = (pthread_t*) malloc(sizeof(pthread_t));
-    int tmp = pthread_create(thread_ids[0], NULL, thread_routine_santa, (void *) &conf);
-
-    if(tmp != 0){
-        perror("Failed to start thread!\n");
-        exit(EXIT_FAILURE);
-    }
-
-    //Create reindeers
-    for (size_t i = 1; i <= 9; i++)
-    {   
-        thread_ids[i] = (pthread_t*) malloc(sizeof(pthread_t));
-        int tmp = pthread_create(thread_ids[i], NULL, thread_routine_reindeer, (void *) &conf);
-
-        if(tmp != 0){
-            perror("Failed to start thread!\n");
-            exit(EXIT_FAILURE);
-        }
-    }
-    
-    //Create elves
-    for (size_t i = 10; i < 20; i++)
-    {
-        thread_ids[i] = (pthread_t*) malloc(sizeof(pthread_t));
-        int tmp = pthread_create(thread_ids[i], NULL, thread_routine_elf, (void *) &conf);
-
-        if(tmp != 0){
-            perror("Failed to start thread!\n");
-            exit(EXIT_FAILURE);
-        }
-    }
+    create_santa(thread_ids, &conf);
+    create_reindeers(thread_ids, &conf);
+    create_elves(thread_ids, &conf);
     
     pause();
 
-    for (size_t i = 0; i < 20; i++)
-    {
-       pthread_kill(*thread_ids[i], SIGINT);
-       free(thread_ids[i]);
-    }
-    free(thread_ids);
-
-    for (size_t i = 0; i < semaphores_count; i++)
-    {
-        sem_destroy(&semaphores[i]);
-    }
-
-    free(semaphores);
-    free(waiting_elves);
-    free(waiting_reindeers);
-
+    cleanup(thread_ids, semaphores, semaphores_count, waiting_elves, waiting_reindeers);
     return 0;   
+}
+
+void create_santa(pthread_t** thread_ids, struct thread_config* conf){
+    thread_ids[0] = (pthread_t*) malloc(sizeof(pthread_t));
+    int test_value = pthread_create(thread_ids[0], NULL, thread_routine_santa, (void *)conf);
+    if(test_value != 0){
+        perror("Failed to start thread!\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
+void create_reindeers(pthread_t** thread_ids, struct thread_config* conf){
+        for (size_t i = 1; i <= 9; i++)
+    {   
+        thread_ids[i] = (pthread_t*) malloc(sizeof(pthread_t));
+        int tmp = pthread_create(thread_ids[i], NULL, thread_routine_reindeer, (void *)conf);
+
+        if(tmp != 0){
+            perror("Failed to start thread!\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+}
+
+void create_elves(pthread_t** thread_ids, struct thread_config* conf){
+    for (size_t i = 10; i < 20; i++)
+    {
+        thread_ids[i] = (pthread_t*) malloc(sizeof(pthread_t));
+        int tmp = pthread_create(thread_ids[i], NULL, thread_routine_elf, (void *)conf);
+
+        if(tmp != 0){
+            perror("Failed to start thread!\n");
+            exit(EXIT_FAILURE);
+        }
+    }
 }
 
 void* thread_routine_santa(void* arg){
@@ -242,3 +233,28 @@ void* thread_routine_elf(void* arg){
         }
     }
 } 
+
+void cleanup(pthread_t** thread_ids, sem_t* semaphores, size_t semaphores_count,
+             int* waiting_elves, int* waiting_reindeers) {
+    for (size_t i = 0; i < 20; i++) {
+        pthread_kill(*thread_ids[i], SIGINT);
+        free(thread_ids[i]);
+    }
+    free(thread_ids);
+
+    for (size_t i = 0; i < semaphores_count; i++) {
+        sem_destroy(&semaphores[i]);
+    }
+
+    free(semaphores);
+    free(waiting_elves);
+    free(waiting_reindeers);
+}
+
+void wake_up(){
+
+}
+
+void sig_handler_thread(){
+    exit(EXIT_SUCCESS);
+}
