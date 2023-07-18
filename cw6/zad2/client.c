@@ -1,152 +1,147 @@
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <math.h>
-#include <sys/wait.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
-#include <sys/ipc.h>
 #include "config.h"
-#include <signal.h>
-#include <mqueue.h>
 
-void handle_rcv(int serverid, char* msg, char* rcv);
+void handle_rcv(struct msgbuf* rcv);
+void clear_mtext(struct msgbuf* msg);
+void close_program();
+void process_message_queue();
+void init_connection(int server_messqueue_id, int client_messqueue_id);
 
 int running = 1;
-int init = 1;
-mqd_t client_id = 0;
-mqd_t msqid;
-mqd_t serverid;
-char* queue_name;
-
-
-void handler(){
-    char* msg = calloc(MAX_MESSAGE_LENGTH+1, sizeof(char));
-    running = 0;
-    sprintf(msg, "%d %d %s",  COMM_STOP, client_id," ");
-    mq_send(serverid, msg, MAX_MESSAGE_LENGTH+1, COMM_STOP);  
-    mq_close(msqid);
-    mq_close(serverid);
-    mq_unlink(queue_name);
-    exit(EXIT_SUCCESS);
-}
-
-void handler_alarm(){
-    char* tmp_msg = calloc(MAX_MESSAGE_LENGTH+1, sizeof(char));
-    char* tmp_rcv = calloc(MAX_MESSAGE_LENGTH+1, 1);
-    mq_receive(msqid, tmp_rcv, MAX_MESSAGE_LENGTH+1, NULL);
-    handle_rcv(serverid, tmp_msg, tmp_rcv);
-    const struct sigevent notify = {SIGEV_SIGNAL, SIGALRM};
-    mq_notify(msqid, &notify);
-}
+int client_name = 0;
+mqd_t client_messqueue_id;
+mqd_t server_messqueue_id;
+char* client_queue_path;
+unsigned int* priority;
 
 int main(int argc, char const *argv[])
-{      
-    char* msg = calloc(MAX_MESSAGE_LENGTH+1, sizeof(char));
-    char* rcv = calloc(MAX_MESSAGE_LENGTH+1, 1);
+{   
+    struct msgbuf msg = {COMM_INIT, 0, ""};
+    struct msgbuf rcv;
     srand(time(NULL));
-    signal(SIGINT, handler);
-    signal(SIGALRM, handler_alarm);
-    unsigned int* priority;
+    signal(SIGINT, close_program);
+    signal(SIGALRM, process_message_queue);
 
     struct mq_attr attr;
-    attr.mq_msgsize = MAX_MESSAGE_LENGTH + 1;
+    attr.mq_msgsize = sizeof(rcv);
     attr.mq_flags = 0;
     attr.mq_maxmsg = 10;
     attr.mq_curmsgs = 0;
-
-    serverid = mq_open("/kolejkaServera", O_WRONLY,  0666, &attr);
+    server_messqueue_id = mq_open("/kolejkaServera", O_WRONLY,  0666, &attr);
 
     key_t key = rand();
-    queue_name = calloc(128, sizeof(char));
-    sprintf(queue_name, "/client-%d", key);
+    client_queue_path = calloc(128, sizeof(char));
+    sprintf(client_queue_path, "/client-%d", key);
+    client_messqueue_id = mq_open(client_queue_path, O_CREAT|O_RDWR,  0666, &attr);
 
-    msqid = mq_open(queue_name, O_CREAT|O_RDWR,  0666, &attr);
+    init_connection(server_messqueue_id, client_messqueue_id);
+    msg.client_id = client_name;
 
-    sprintf(msg, "%d %d %s", COMM_INIT, msqid, queue_name);
-    mq_send(serverid, msg, MAX_MESSAGE_LENGTH + 1, COMM_INIT);
-
-    while (init)
-    {
-        if(mq_receive(msqid, rcv, MAX_MESSAGE_LENGTH+1, NULL) != -1){
-            int ntype;
-            int clientId;
-            char* mtext = calloc(1024, sizeof(char));
-
-            sscanf(rcv, "%d %d %s", &ntype, &clientId, mtext);
-
-            if(clientId == -1){
-                fprintf(stderr, "max number of clients connected to server");
-                raise(SIGINT);
-            }
-            client_id = clientId;
-            init = 0;
-        }
-    }
+    const struct sigevent notify = {SIGEV_SIGNAL, SIGALRM};
+    mq_notify(client_messqueue_id, &notify);
 
     char* buff = NULL;
 	size_t buff_size;
-    const struct sigevent notify = {SIGEV_SIGNAL, SIGALRM};
-    mq_notify(msqid, &notify);
-
     while (running)
     {
-        printf("%d>", client_id);
+        printf("%d>", client_name);
 		getline(&buff, &buff_size, stdin);
 
         if(buff_size > 0){
             if(strncmp(buff, "LIST", 4) == 0){
-                sprintf(msg, "%d %d %s", COMM_LIST, client_id, " ");
-                mq_send(serverid, msg, MAX_MESSAGE_LENGTH+1, COMM_LIST);  
+                msg.ntype = COMM_LIST;
+                mq_send(server_messqueue_id, (char*)&msg, sizeof(msg), COMM_LIST);  
             }else if(strncmp(buff, "2ALL", 4) == 0){
-                sprintf(msg, "%d %d %s",  COMM_2ALL, client_id, &buff[5]);
-                mq_send(serverid, msg, MAX_MESSAGE_LENGTH+1, COMM_2ALL);  
+                msg.ntype = COMM_2ALL;
+                strncpy(msg.mtext, &buff[5], strlen(&buff[5])-1);
+                mq_send(server_messqueue_id, (char*)&msg, sizeof(msg), COMM_2ALL);  
             }else if(strncmp(buff, "STOP", 4) == 0){
-                mq_close(msqid);
-                mq_close(serverid);
-                mq_unlink(queue_name);
-                exit(EXIT_SUCCESS);
+                raise(SIGINT);
             }else if(strncmp(buff, "2ONE", 4) == 0){
-                sprintf(msg, "%d %d %s\t", COMM_2ONE, client_id, &buff[5]);
-                mq_send(serverid, msg, MAX_MESSAGE_LENGTH+1, COMM_2ONE);  
-            }else if(strncmp(buff, "CHECK", 5) == 0){
-                //do nothing
+                msg.ntype = COMM_2ONE;
+                clear_mtext(&msg);
+                strncpy(msg.mtext, &buff[5], strlen(&buff[5])-1);
+                mq_send(server_messqueue_id, (char*)&msg, sizeof(msg), COMM_2ONE);  
             }else{
                 printf("Invalid command\n");
             }
         }
-        
-
+        clear_mtext(&msg);
     }
 
     return 0;
 }
 
+void close_program(){
+    running = 0;
+    struct msgbuf msg;
 
-void handle_rcv(int serverid, char* msg, char* rcv){
-    int ntype;
-    int clientId;
-    char* mtext = calloc(1024, sizeof(char));
-    sscanf(rcv, "%d %d %[^\t\n]", &ntype, &clientId, mtext);
-    if(ntype == COMM_STOP){
+    msg.ntype = COMM_STOP;
+    msg.client_id = client_name;
+    mq_send(server_messqueue_id, (char*)&msg, sizeof(msg), COMM_STOP);  
+    mq_close(client_messqueue_id);
+    mq_close(server_messqueue_id);
+    mq_unlink(client_queue_path);
+
+    exit(EXIT_SUCCESS);
+}
+
+void process_message_queue(){
+    struct msgbuf rcv;
+    if(running){
+        mq_receive(client_messqueue_id, (char*)&rcv, sizeof(rcv), NULL);
+        handle_rcv(&rcv);
+        const struct sigevent notify = {SIGEV_SIGNAL, SIGALRM};
+        mq_notify(client_messqueue_id, &notify);
+    }
+}
+
+void init_connection(int server_messqueue_id, int client_messqueue_id){
+
+    struct msgbuf msg;
+    struct msgbuf rcv;
+    msg.client_id = client_messqueue_id;
+    msg.ntype = COMM_INIT;
+    strcpy(msg.mtext, client_queue_path);
+
+    int test = mq_send(server_messqueue_id, (char*)&msg, sizeof(msg), COMM_INIT);
+    if(test == -1){
+        perror("Error sending inti message\n");
+        exit(EXIT_FAILURE);
+    }
+    int is_waiting_for_init_message = 1;
+    while (is_waiting_for_init_message)
+    {
+        if(mq_receive(client_messqueue_id, (char*)&rcv, sizeof(msg), NULL) != -1){
+            if(rcv.ntype == COMM_INIT){
+                if(rcv.client_id == -1){
+                    fprintf(stderr, "max number of clients connected to server. Try again later\n");
+                    raise(SIGINT);
+                }
+                client_name = rcv.client_id;
+                is_waiting_for_init_message = 0;
+            }
+        }
+    }
+}
+
+void handle_rcv(struct msgbuf* rcv){
+    if(rcv->ntype == COMM_STOP){
         running = 0;
         raise(SIGINT);
-    }else if(ntype == COMM_2ALL){
-        printf("Broadcast message: %s\n", mtext);
-    }else if(ntype == COMM_2ONE){
-        printf("Private message: %s\n", mtext);
-    }else if(ntype == COMM_LIST){
-        printf("List of users: %s\n", mtext);
+    }else if(rcv->ntype == COMM_2ALL){
+        printf("\nBroadcast message: %s\n", rcv->mtext);
+    }else if(rcv->ntype == COMM_2ONE){
+        printf("\nPrivate message: %s\n", rcv->mtext);
+    }else if(rcv->ntype == COMM_LIST){
+        printf("\nList of users: %s\n", rcv->mtext);
     }else{
-        printf("Invalid message recived\n");
+        printf("\nInvalid message recived\n");
     }
-    printf("%d>", client_id);
+    printf("%d>", client_name);
     fflush(stdout);
-    free(mtext);
+}
+
+void clear_mtext(struct msgbuf* msg){
+    memset(msg->mtext, 0, MAX_MESSAGE_LENGTH+1);
+    strncpy(msg->mtext, "\0", 1);
 }

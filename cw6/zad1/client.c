@@ -66,6 +66,7 @@ int main(int argc, char const *argv[])
 void close_program(){
     running = 0;
     msg.ntype = COMM_STOP;
+    msg.client_id = client_name;
     msgsnd(server_messqueue_id, &msg, sizeof(msg), IPC_NOWAIT);
     msgctl(client_messqueue_id, IPC_RMID, NULL);
     exit(EXIT_SUCCESS);
