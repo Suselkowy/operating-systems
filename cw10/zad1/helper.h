@@ -1,3 +1,11 @@
+#include <sys/socket.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/un.h>
+#include <sys/epoll.h>
+#include <signal.h>
 #define MAX_NICK_LENGHT 16
 #define MAX_MESSAGE_LENGTH 1024
 
@@ -16,7 +24,6 @@ enum COMMANDS{
     COMM_PING,
     NUMBER_OF_TYPES       
 };
-
 
 typedef struct message {
   int type;
