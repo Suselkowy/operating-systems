@@ -1,50 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <sys/shm.h> 
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#define HAIDRESSER_NUM 4
-#define SEATS_NUM 3
-#define WAITINGROOM_NUM 5
-#define SEMAPHORE_NUM 4
-#define CLIENTS_NUM 10
-
-typedef struct shared_memory_t
-{
-    int queue[WAITINGROOM_NUM];
-    int queue_start;
-    int queue_tail;
-} shared_memory_t;
-
-typedef struct sh_config{
-    int sem_key;
-    int mem_key;
-} sh_config;
+#include "semaphores_helpers.h"
 
 union semun {
-int val;
-struct semid_ds *buf;
-unsigned short  *array;
+    int val;
+    struct semid_ds *buf;
+    unsigned short  *array;
 } arg;
-
-enum hairstyle{
-    STYLE_SHORT,
-    STYLE_LONG,
-    STYLE_SPIKY,
-    STYLE_BALD,
-    STYLE_NUM
-};
-
-enum semaphore{
-    QUEUE_ACCESS,
-    WAITINGROOM,
-    SEATS,
-    SEATED
-};
 
 sh_config* server_init(){
     char *shm;
@@ -97,7 +57,7 @@ sh_config* server_init(){
 }
 
 
-sh_config* get_stup(){
+sh_config* get_client_config(){
     key_t key = ftok("./semafory", 'S');
 
     int sem_id = semget(key, SEMAPHORE_NUM, 0666);
@@ -138,4 +98,8 @@ int release(struct sh_config* config, int sem_num){
 void close_all(struct sh_config* config){
     semctl(config->sem_key, 0, IPC_RMID, arg);
     shmctl(config->mem_key, IPC_RMID, NULL);
+}
+
+void detach_shared_memeory(shared_memory_t* shared_memory_pt){
+    shmdt(shared_memory_pt);
 }

@@ -1,55 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <sys/shm.h> 
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/types.h>
-#include <unistd.h>
-
-#include <fcntl.h>
-#include <semaphore.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
-
-#define HAIDRESSER_NUM 4
-#define SEATS_NUM 3
-#define WAITINGROOM_NUM 5
-#define SEMAPHORE_NUM 4
-#define CLIENTS_NUM 2
-
-typedef struct shared_memory_t
-{
-    int queue[WAITINGROOM_NUM];
-    int queue_start;
-    int queue_tail;
-} shared_memory_t;
-
-typedef struct sh_config{
-    sem_t* sem_key[SEMAPHORE_NUM];
-    int mem_key;
-} sh_config;
+#include "semaphores_helpers.h"
 
 union semun {
-int val;
-struct semid_ds *buf;
-unsigned short  *array;
+    int val;
+    struct semid_ds *buf;
+    unsigned short  *array;
 } arg;
-
-enum hairstyle{
-    STYLE_SHORT,
-    STYLE_LONG,
-    STYLE_SPIKY,
-    STYLE_BALD,
-    STYLE_NUM
-};
-
-enum semaphore{
-    QUEUE_ACCESS,
-    WAITINGROOM,
-    SEATS,
-    SEATED
-};
 
 sh_config* server_init(){
     int tab[4] = {1, 0, SEATS_NUM, 0};
@@ -109,7 +64,7 @@ sh_config* server_init(){
 }
 
 
-sh_config* get_stup(){
+sh_config* get_client_config(){
     int tab[4] = {1, 0, SEATS_NUM, 0};
     char buff[128];
     char *shm;
@@ -160,4 +115,15 @@ void close_all(struct sh_config* config){
     }
     
     shm_unlink("sharedmemPOSIX");
+}
+
+void detach_shared_memeory(shared_memory_t* shared_memory_pt){
+    munmap(shared_memory_pt, sizeof(shared_memory_t));
+}
+
+void close_semaphores(struct sh_config* config){
+    for (size_t i = 0; i < SEMAPHORE_NUM; i++)
+    {
+        sem_close(config->sem_key[i]);
+    }
 }

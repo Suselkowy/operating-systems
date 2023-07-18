@@ -1,13 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <sys/shm.h> 
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <signal.h>
-#include "semaphores_helpers.c"
+#include "semaphores_helpers.h"
 
 int pids[HAIDRESSER_NUM + CLIENTS_NUM];
 int ind = 0;

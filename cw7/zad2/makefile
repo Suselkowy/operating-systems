@@ -5,15 +5,15 @@ all:
 
 .PHONY:server
 server:
-	gcc -o server server.c -lm
+	gcc -o server server.c semaphores_helpers.c -lm -lrt
 
 .PHONY:client
 client:
-	gcc -o client client.c
+	gcc -o client client.c semaphores_helpers.c -lrt
 
 .PHONY:hairdresser
 hairdresser:
-	gcc -o hairdresser hairdresser.c
+	gcc -o hairdresser hairdresser.c semaphores_helpers.c -lrt
 
 clean:
 	rm -f server
